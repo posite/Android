@@ -33,6 +33,9 @@ class ProfileAdapter(private val datas : ArrayList<ProfileData>) : RecyclerView.
             txtTitle.text = data.title
             txtAddress.text = data.roadaddress
             Glide.with(itemView).load(data.thumbnailpath).into(imgProfile)
+            itemView.setOnClickListener{
+
+            }
 
         }
     }

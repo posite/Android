@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sys.test.databinding.ActivityMainBinding
@@ -43,8 +44,8 @@ class MainActivity : AppCompatActivity() {
                 if(response.isSuccessful && response.code() == 200){
                     data = response.body()!!
                     binding.button.text=data.items[1].title
-                    longitude = data.items[1].longitude
-                    latitude = data.items[1].latitude
+                    longitude = data.items[1].longitude ?: 127.005515
+                    latitude = data.items[1].latitude ?: 37.537229
                     initRecycler(data)
                     Log.d("결과", "성공 : ${response.raw()}")
                 }
@@ -73,14 +74,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun initRecycler(monttak: Monttak) {
+        var count = 0
+        for(i in 0 until monttak.items.size){
+            if(monttak.items[i].repPhoto!=null && monttak.items[i].repPhoto.photoid!=null){
+                if(monttak.items[i].repPhoto.photoid.thumbnailpath!=null ){
+                    if(!monttak.items[i].roadaddress.isNullOrEmpty()){
+                        datas.add(ProfileData(roadaddress ="주소 : "+monttak.items[i].roadaddress, thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
+                        count++
+                    }else{
+                        datas.add(ProfileData(roadaddress ="주소 : ", thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
+                        count++
+                    }
 
-        for(i in 0 until 21){
-            if(monttak.items[i].roadaddress.isNullOrEmpty()){
-                datas.add(ProfileData(roadaddress ="주소 : ", thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
-            }else{
-                datas.add(ProfileData(roadaddress ="주소 : "+monttak.items[i].roadaddress, thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
+                }
             }
         }
+
+        Log.d("실제 : ", count.toString())
         profileAdapter = ProfileAdapter(datas)
         profileAdapter.notifyDataSetChanged()
         binding.rvProfile.adapter = profileAdapter
