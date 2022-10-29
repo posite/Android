@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun initRecycler(monttak: Monttak) {
 
-        for(i in 0 until monttak.items.size){
+        for(i in 0 until 21){
             if(monttak.items[i].roadaddress.isNullOrEmpty()){
                 datas.add(ProfileData(roadaddress ="주소 : ", thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
             }else{
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvProfile.adapter = profileAdapter
         binding.rvProfile.layoutManager = LinearLayoutManager(this)
         binding.rvProfile.addItemDecoration(VerticalItemDecorator(20))
-        binding.rvProfile.addItemDecoration(HorizontalItemDecorator(20))
+        binding.rvProfile.addItemDecoration(HorizontalItemDecorator(10))
 
         Log.d("size", profileAdapter.itemCount.toString())
     }
