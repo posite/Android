@@ -29,10 +29,10 @@ class ProfileAdapter(private val datas : ArrayList<ProfileData>) : RecyclerView.
         private val txtAddress: TextView = itemView.findViewById(R.id.tv_rv_address)
         private val imgProfile: ImageView = itemView.findViewById(R.id.img_rv_photo)
 
-        fun bind(item: ProfileData) {
-            txtTitle.text = item.title
-            txtAddress.text = item.roadaddress
-            Glide.with(itemView).load(item.thumbnailpath).into(imgProfile)
+        fun bind(data: ProfileData) {
+            txtTitle.text = data.title
+            txtAddress.text = data.roadaddress
+            Glide.with(itemView).load(data.thumbnailpath).into(imgProfile)
 
         }
     }

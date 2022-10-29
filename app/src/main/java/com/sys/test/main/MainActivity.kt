@@ -45,8 +45,6 @@ class MainActivity : AppCompatActivity() {
                     binding.button.text=data.items[1].title
                     longitude = data.items[1].longitude
                     latitude = data.items[1].latitude
-                    val handler = Handler()
-                    handler.postDelayed({ finish() }, 1500)
                     initRecycler(data)
                     Log.d("결과", "성공 : ${response.raw()}")
                 }
@@ -75,23 +73,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun initRecycler(monttak: Monttak) {
+
         for(i in 0 until monttak.items.size){
             if(monttak.items[i].roadaddress.isNullOrEmpty()){
-                datas.add(ProfileData(roadaddress ="주소 : ", thumbnailpath = monttak.items[0].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[0].title))
+                datas.add(ProfileData(roadaddress ="주소 : ", thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
             }else{
-                datas.add(ProfileData(roadaddress ="주소 : "+monttak.items[0].roadaddress, thumbnailpath = monttak.items[0].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[0].title))
+                datas.add(ProfileData(roadaddress ="주소 : "+monttak.items[i].roadaddress, thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
             }
         }
         profileAdapter = ProfileAdapter(datas)
-        Log.d("size", profileAdapter.itemCount.toString())
-
-        binding.rvProfile.layoutManager = LinearLayoutManager(this)
+        profileAdapter.notifyDataSetChanged()
         binding.rvProfile.adapter = profileAdapter
+        binding.rvProfile.layoutManager = LinearLayoutManager(this)
         binding.rvProfile.addItemDecoration(VerticalItemDecorator(20))
         binding.rvProfile.addItemDecoration(HorizontalItemDecorator(20))
 
-
-
+        Log.d("size", profileAdapter.itemCount.toString())
     }
 
 }
