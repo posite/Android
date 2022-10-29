@@ -1,4 +1,4 @@
-package com.sys.test
+package com.sys.test.network
 
 data class Item(
     val address: String,

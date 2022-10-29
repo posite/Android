@@ -1,6 +1,6 @@
-package com.sys.test
+package com.sys.test.network
 
-data class monttak(
+data class Monttak(
     val currentPage: Int,
     val items: List<Item>,
     val pageCount: Int,

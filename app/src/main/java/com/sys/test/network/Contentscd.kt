@@ -1,6 +1,6 @@
-package com.sys.test
+package com.sys.test.network
 
-data class Region1cd(
+data class Contentscd(
     val label: String,
     val refId: String,
     val value: String
