@@ -35,10 +35,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        val toolbar = findViewById(R.id.main_layout_toolbar) as androidx.appcompat.widget.Toolbar
-//        setSupportActionBar(toolbar)
-//        val ab = supportActionBar!!
-//        ab.setDisplayShowTitleEnabled(false)
         val intent = Intent(this, LoadingActivity::class.java)
         startActivity(intent)
         var longitude : Double = 0.0
@@ -110,24 +106,5 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_drawer_navigation, menu)
-        return true
-    }
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when(item?.itemId){
-//            R.id.action_search -> {
-//                //검색 버튼 눌렀을 때
-//                Toast.makeText(applicationContext, "검색 이벤트 실행", Toast.LENGTH_LONG).show()
-//                return super.onOptionsItemSelected(item)
-//            }
-//            R.id.action_share -> {
-//                //공유 버튼 눌렀을 때
-//                Toast.makeText(applicationContext, "공유 이벤트 실행", Toast.LENGTH_LONG).show()
-//                return super.onOptionsItemSelected(item)
-//            }
-//            else -> return super.onOptionsItemSelected(item)
-//        }
-//    }
 
 }
