@@ -4,28 +4,23 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.view.GravityCompat
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.sys.test.R
 import com.sys.test.databinding.ActivityMainBinding
 import com.sys.test.network.KakaoMapApi
 import com.sys.test.network.Monttak
-import com.sys.test.profiledata.HorizontalItemDecorator
-import com.sys.test.profiledata.ProfileAdapter
-import com.sys.test.profiledata.ProfileData
-import com.sys.test.profiledata.VerticalItemDecorator
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private var isNavigationOpen = false
     lateinit var data : Monttak
 
     private lateinit var binding: ActivityMainBinding
@@ -34,7 +29,9 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setToolbar()
 
+        binding.navigationView.setNavigationItemSelectedListener(this)
         val intent = Intent(this, LoadingActivity::class.java)
         startActivity(intent)
         var longitude : Double = 0.0
@@ -106,5 +103,46 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+    private fun setToolbar(){
+        setSupportActionBar(binding.toolbar)
 
+        // 툴바 왼쪽 버튼 설정
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)  // 왼쪽 버튼 사용 여부 true
+        supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp)  // 왼쪽 버튼 이미지 설정
+        supportActionBar!!.setDisplayShowTitleEnabled(false)    // 타이틀 안보이게 하기
+    }
+    // 툴바 메뉴 버튼을 설정
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)       // main_menu 메뉴를 toolbar 메뉴 버튼으로 설정
+        return true
+    }
+
+    // 툴바 메뉴 버튼이 클릭 됐을 때 콜백
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item!!.itemId){
+            android.R.id.home->{ // 메뉴 버튼
+                binding.drawerLayout.openDrawer(GravityCompat.START)    // 네비게이션 드로어 열기
+            }
+            R.id.menu_search-> Snackbar.make(binding.toolbar,"Search menu pressed",Snackbar.LENGTH_SHORT).show()
+            R.id.menu_account-> Snackbar.make(binding.toolbar,"Account menu pressed",Snackbar.LENGTH_SHORT).show()
+            R.id.menu_logout-> Snackbar.make(binding.toolbar,"Logout menu pressed",Snackbar.LENGTH_SHORT).show()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){  // 네비게이션 메뉴가 클릭되면 스낵바가 나타난다.
+            R.id.account-> Snackbar.make(binding.toolbar,"Navigation Account pressed",Snackbar.LENGTH_SHORT).show()
+            R.id.setting->Snackbar.make(binding.toolbar,"Navigation Setting pressed",Snackbar.LENGTH_SHORT).show()
+        }
+        binding.drawerLayout.closeDrawers() // 기능을 수행하고 네비게이션을 닫아준다.
+        return false
+    }
+    override fun onBackPressed() {
+        if(binding.drawerLayout.isDrawerOpen(GravityCompat.START)){
+            binding.drawerLayout.closeDrawers()
+        }else{
+            super.onBackPressed()
+        }
+    }
 }
