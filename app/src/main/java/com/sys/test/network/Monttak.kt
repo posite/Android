@@ -1,6 +1,8 @@
 package com.sys.test.network
 
-data class Monttak(
+import java.io.Serializable
+
+data class Monttak (
     val currentPage: Int,
     val items: List<Item>,
     val pageCount: Int,
@@ -9,4 +11,4 @@ data class Monttak(
     val resultCount: Int,
     val resultMessage: String,
     val totalCount: Int
-)
+):Serializable

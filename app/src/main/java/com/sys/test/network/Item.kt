@@ -1,5 +1,7 @@
 package com.sys.test.network
 
+import java.io.Serializable
+
 data class Item(
     val address: String?,
     val alltag: String?,
@@ -16,4 +18,4 @@ data class Item(
     val roadaddress: String?,
     val tag: String?,
     val title: String
-)
+):Serializable

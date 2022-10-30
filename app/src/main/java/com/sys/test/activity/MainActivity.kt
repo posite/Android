@@ -1,4 +1,4 @@
-package com.sys.test.main
+package com.sys.test.activity
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -6,9 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.widget.TextView
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.sys.test.R
 import com.sys.test.databinding.ActivityMainBinding
 import com.sys.test.network.KakaoMapApi
 import com.sys.test.network.Monttak
@@ -21,8 +25,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var profileAdapter: ProfileAdapter
-    private var datas = ArrayList<ProfileData>()
 
     lateinit var data : Monttak
 
@@ -32,6 +34,13 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+//        val toolbar = findViewById(R.id.main_layout_toolbar) as androidx.appcompat.widget.Toolbar
+//        setSupportActionBar(toolbar)
+//        val ab = supportActionBar!!
+//        ab.setDisplayShowTitleEnabled(false)
+        val intent = Intent(this, LoadingActivity::class.java)
+        startActivity(intent)
         var longitude : Double = 0.0
         var latitude : Double  = 0.0
 
@@ -46,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     binding.button.text=data.items[1].title
                     longitude = data.items[1].longitude ?: 127.005515
                     latitude = data.items[1].latitude ?: 37.537229
-                    initRecycler(data)
+
                     Log.d("결과", "성공 : ${response.raw()}")
                 }
 
@@ -72,33 +81,53 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-    private fun initRecycler(monttak: Monttak) {
-        var count = 0
-        for(i in 0 until monttak.items.size){
-            if(monttak.items[i].repPhoto!=null && monttak.items[i].repPhoto.photoid!=null){
-                if(monttak.items[i].repPhoto.photoid.thumbnailpath!=null ){
-                    if(!monttak.items[i].roadaddress.isNullOrEmpty()){
-                        datas.add(ProfileData(roadaddress ="주소 : "+monttak.items[i].roadaddress, thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
-                        count++
-                    }else{
-                        datas.add(ProfileData(roadaddress ="주소 : ", thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath, title ="제목 : "+ monttak.items[i].title))
-                        count++
-                    }
-
-                }
-            }
+        binding.bol.setOnClickListener {
+            var intent = Intent(applicationContext, SecondActivity::class.java)
+            intent.putExtra("datas",data)
+            intent.putExtra("label","정보,축제/행사")
+            intent.putExtra("split","bol")
+            startActivity(intent)
         }
-
-        Log.d("실제 : ", count.toString())
-        profileAdapter = ProfileAdapter(datas)
-        profileAdapter.notifyDataSetChanged()
-        binding.rvProfile.adapter = profileAdapter
-        binding.rvProfile.layoutManager = LinearLayoutManager(this)
-        binding.rvProfile.addItemDecoration(VerticalItemDecorator(20))
-        binding.rvProfile.addItemDecoration(HorizontalItemDecorator(10))
-
-        Log.d("size", profileAdapter.itemCount.toString())
+        binding.nol.setOnClickListener {
+            var intent = Intent(applicationContext, SecondActivity::class.java)
+            intent.putExtra("datas",data)
+            intent.putExtra("label","테마여행,쇼핑")
+            intent.putExtra("split","bol")
+            startActivity(intent)
+        }
+        binding.shil.setOnClickListener {
+            var intent = Intent(applicationContext, SecondActivity::class.java)
+            intent.putExtra("datas",data)
+            intent.putExtra("label","정보,숙박")
+            intent.putExtra("split","shil")
+            startActivity(intent)
+        }
+        binding.muk.setOnClickListener {
+            var intent = Intent(applicationContext, SecondActivity::class.java)
+            intent.putExtra("datas",data)
+            intent.putExtra("label","음식점")
+            intent.putExtra("split","muk")
+            startActivity(intent)
+        }
     }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_drawer_navigation, menu)
+        return true
+    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when(item?.itemId){
+//            R.id.action_search -> {
+//                //검색 버튼 눌렀을 때
+//                Toast.makeText(applicationContext, "검색 이벤트 실행", Toast.LENGTH_LONG).show()
+//                return super.onOptionsItemSelected(item)
+//            }
+//            R.id.action_share -> {
+//                //공유 버튼 눌렀을 때
+//                Toast.makeText(applicationContext, "공유 이벤트 실행", Toast.LENGTH_LONG).show()
+//                return super.onOptionsItemSelected(item)
+//            }
+//            else -> return super.onOptionsItemSelected(item)
+//        }
+//    }
 
 }
