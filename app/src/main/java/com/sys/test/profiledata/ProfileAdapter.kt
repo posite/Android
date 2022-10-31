@@ -1,5 +1,7 @@
 package com.sys.test.profiledata
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +10,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sys.test.R
+import com.sys.test.activity.ThirdActivity
 
-class ProfileAdapter(private val datas : ArrayList<ProfileData>) : RecyclerView.Adapter<ProfileAdapter.ViewHolder>() {
+//datas 형식을 monttak.item이나 monttak으로 바꾸기
+class ProfileAdapter(private val datas : ArrayList<ProfileData>,private val context: Context) : RecyclerView.Adapter<ProfileAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.monttakrecycler,parent,false)
@@ -33,7 +37,9 @@ class ProfileAdapter(private val datas : ArrayList<ProfileData>) : RecyclerView.
             txtAddress.text = data.roadaddress
             Glide.with(itemView).load(data.thumbnailpath).into(imgProfile)
             itemView.setOnClickListener{
-
+                Intent(context,ThirdActivity::class.java).apply {
+                    putExtra("data", data)
+                }.run{context.startActivity(this)}
             }
 
         }
