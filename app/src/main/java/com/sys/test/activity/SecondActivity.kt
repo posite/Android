@@ -45,7 +45,9 @@ class SecondActivity : AppCompatActivity() {
             }
         }
 
-        Log.d("실제 : ", count.toString())
+        Log.d("실제1 : ", count.toString())
+        count = 0
+        Log.d("실제2 : ", count.toString())
         profileAdapter = ProfileAdapter(datas)
         profileAdapter.notifyDataSetChanged()
         when(split){
