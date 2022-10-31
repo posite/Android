@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
     // 툴바 메뉴 버튼을 설정
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)       // main_menu 메뉴를 toolbar 메뉴 버튼으로 설정
+
         return true
     }
 
@@ -123,9 +123,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             android.R.id.home->{ // 메뉴 버튼
                 binding.drawerLayout.openDrawer(GravityCompat.START)    // 네비게이션 드로어 열기
             }
-            R.id.menu_search-> Snackbar.make(binding.toolbar,"Search menu pressed",Snackbar.LENGTH_SHORT).show()
-            R.id.menu_account-> Snackbar.make(binding.toolbar,"Account menu pressed",Snackbar.LENGTH_SHORT).show()
-            R.id.menu_logout-> Snackbar.make(binding.toolbar,"Logout menu pressed",Snackbar.LENGTH_SHORT).show()
         }
         return super.onOptionsItemSelected(item)
     }

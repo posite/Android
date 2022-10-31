@@ -1,12 +1,10 @@
 package com.sys.test.activity
 
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.sys.test.R
 import com.sys.test.databinding.SecondBinding
 import com.sys.test.network.Monttak
 import com.sys.test.profiledata.HorizontalItemDecorator
@@ -54,50 +52,62 @@ class SecondActivity : AppCompatActivity() {
             "nol"->{
                 secondBinding.nollist.adapter = profileAdapter
                 secondBinding.nollist.layoutManager = LinearLayoutManager(this)
-                secondBinding.nollist.addItemDecoration(VerticalItemDecorator(20))
-                secondBinding.nollist.addItemDecoration(HorizontalItemDecorator(10))
 
-                secondBinding.nollist.visibility = View.VISIBLE
-                secondBinding.bollist.visibility = View.INVISIBLE
-                secondBinding.muklist.visibility = View.INVISIBLE
-                secondBinding.shillist.visibility = View.INVISIBLE
+                chooseView(split)
             }
             "bol"->{
                 secondBinding.bollist.adapter = profileAdapter
                 secondBinding.bollist.layoutManager = LinearLayoutManager(this)
-                secondBinding.bollist.addItemDecoration(VerticalItemDecorator(20))
-                secondBinding.bollist.addItemDecoration(HorizontalItemDecorator(10))
 
-                secondBinding.bollist.visibility = View.VISIBLE
-                secondBinding.nollist.visibility = View.INVISIBLE
-                secondBinding.muklist.visibility = View.INVISIBLE
-                secondBinding.shillist.visibility = View.INVISIBLE
+                chooseView(split)
             }
             "shil"->{
                 secondBinding.shillist.adapter = profileAdapter
                 secondBinding.shillist.layoutManager = LinearLayoutManager(this)
-                secondBinding.shillist.addItemDecoration(VerticalItemDecorator(20))
-                secondBinding.shillist.addItemDecoration(HorizontalItemDecorator(10))
 
-                secondBinding.shillist.visibility = View.VISIBLE
-                secondBinding.bollist.visibility = View.INVISIBLE
-                secondBinding.muklist.visibility = View.INVISIBLE
-                secondBinding.nollist.visibility = View.INVISIBLE
+                chooseView(split)
             }
             "muk"->{
                 secondBinding.muklist.adapter = profileAdapter
                 secondBinding.muklist.layoutManager = LinearLayoutManager(this)
-                secondBinding.muklist.addItemDecoration(VerticalItemDecorator(20))
-                secondBinding.muklist.addItemDecoration(HorizontalItemDecorator(10))
 
-                secondBinding.muklist.visibility = View.VISIBLE
-                secondBinding.bollist.visibility = View.INVISIBLE
-                secondBinding.nollist.visibility = View.INVISIBLE
-                secondBinding.shillist.visibility = View.INVISIBLE
+                chooseView(split)
             }
         }
 
         Log.d("size", profileAdapter.itemCount.toString())
     }
+    private fun chooseView(category: String){
 
+        when(category){
+            "nol"->{
+                secondBinding.nollist.addItemDecoration(VerticalItemDecorator(20))
+                secondBinding.nollist.addItemDecoration(HorizontalItemDecorator(10))
+                secondBinding.nollist.visibility = View.VISIBLE
+                secondBinding.bollist.visibility = View.INVISIBLE
+                secondBinding.muklist.visibility = View.INVISIBLE
+                secondBinding.shillist.visibility = View.INVISIBLE}
+            "bol"->{
+                secondBinding.bollist.addItemDecoration(VerticalItemDecorator(20))
+                secondBinding.bollist.addItemDecoration(HorizontalItemDecorator(10))
+                secondBinding.bollist.visibility = View.VISIBLE
+                secondBinding.nollist.visibility = View.INVISIBLE
+                secondBinding.muklist.visibility = View.INVISIBLE
+                secondBinding.shillist.visibility = View.INVISIBLE}
+            "shil"->{
+                secondBinding.shillist.addItemDecoration(VerticalItemDecorator(20))
+                secondBinding.shillist.addItemDecoration(HorizontalItemDecorator(10))
+                secondBinding.shillist.visibility = View.VISIBLE
+                secondBinding.bollist.visibility = View.INVISIBLE
+                secondBinding.muklist.visibility = View.INVISIBLE
+                secondBinding.nollist.visibility = View.INVISIBLE}
+            "muk"->{
+                secondBinding.muklist.addItemDecoration(VerticalItemDecorator(20))
+                secondBinding.muklist.addItemDecoration(HorizontalItemDecorator(10))
+                secondBinding.muklist.visibility = View.VISIBLE
+                secondBinding.bollist.visibility = View.INVISIBLE
+                secondBinding.nollist.visibility = View.INVISIBLE
+                secondBinding.shillist.visibility = View.INVISIBLE}
+        }
+    }
 }
