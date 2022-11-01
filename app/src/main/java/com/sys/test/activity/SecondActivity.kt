@@ -12,6 +12,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sys.test.R
 import com.sys.test.databinding.SecondBinding
+import com.sys.test.network.Item
 import com.sys.test.network.Monttak
 import com.sys.test.profiledata.HorizontalItemDecorator
 import com.sys.test.profiledata.ProfileAdapter
@@ -21,7 +22,7 @@ import com.sys.test.profiledata.VerticalItemDecorator
 class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     lateinit var profileAdapter: ProfileAdapter
     private var datas = ArrayList<ProfileData>()
-    private lateinit var data: Monttak
+    private lateinit var data: ArrayList<Item>
     private lateinit var secondBinding: SecondBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,29 +30,29 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         setContentView(secondBinding.root)
         setToolbar()
         val intent = intent
-        data = intent.getSerializableExtra("datas") as Monttak
+        data = intent.getSerializableExtra("datas") as ArrayList<Item>
         val split = intent.getStringExtra("split")!!
         val label = intent.getStringExtra("label")!!
         initRecycler(data, label, split)
 
     }
 
-    private fun initRecycler(monttak: Monttak, label: String, split: String) {
+    private fun initRecycler(items: ArrayList<Item>, label: String, split: String) {
         var count = 0
         val token = label.split(",")
-        for (i in 0 until monttak.items.size) {
-            if (monttak.items[i].repPhoto != null && monttak.items[i].repPhoto.photoid != null) {
-                if (monttak.items[i].repPhoto.photoid.thumbnailpath != null && token.contains(
-                        monttak.items[i].contentscd.label
+        for (i in 0 until items.size) {
+            if (items[i].repPhoto != null && items[i].repPhoto.photoid != null) {
+                if (items[i].repPhoto.photoid.thumbnailpath != null && token.contains(
+                        items[i].contentscd.label
                     )
                 ) {
-                    if (!monttak.items[i].roadaddress.isNullOrEmpty()) {
+                    if (!items[i].roadaddress.isNullOrEmpty()) {
                         datas.add(
                             ProfileData(
-                                roadaddress = "주소 : " + monttak.items[i].roadaddress,
-                                thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath,
-                                title = "제목 : " + monttak.items[i].title,
-                                item = monttak.items[i]
+                                roadaddress = "주소 : " + items[i].roadaddress,
+                                thumbnailpath = items[i].repPhoto.photoid.thumbnailpath,
+                                title = "제목 : " + items[i].title,
+                                item = items[i]
                             )
                         )
                         count++
@@ -59,9 +60,9 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                         datas.add(
                             ProfileData(
                                 roadaddress = "주소 : ",
-                                thumbnailpath = monttak.items[i].repPhoto.photoid.thumbnailpath,
-                                title = "제목 : " + monttak.items[i].title,
-                                item = monttak.items[i]
+                                thumbnailpath = items[i].repPhoto.photoid.thumbnailpath,
+                                title = "제목 : " + items[i].title,
+                                item = items[i]
                             )
                         )
                         count++

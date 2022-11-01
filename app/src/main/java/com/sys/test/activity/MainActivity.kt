@@ -13,15 +13,21 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sys.test.R
 import com.sys.test.databinding.ActivityMainBinding
+import com.sys.test.network.Item
 import com.sys.test.network.KakaoMapApi
 import com.sys.test.network.Monttak
+import com.sys.test.profiledata.ProfileData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private var isNavigationOpen = false
-    lateinit var data : Monttak
+    private lateinit var data :ArrayList<Item>
 
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,31 +38,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setToolbar()
 
         binding.navigationView.setNavigationItemSelectedListener(this)
-        val intent = Intent(this, LoadingActivity::class.java)
-        startActivity(intent)
+
         var longitude : Double = 0.0
         var latitude : Double  = 0.0
-
+        data = ArrayList<Item>()
         val retrofit = Retrofit.Builder().baseUrl("https://api.visitjeju.net/vsjApi/contents/").addConverterFactory(GsonConverterFactory.create()).build()
         val api = retrofit.create(KakaoMapApi::class.java)
-        val kakaoMap = api.getData()
-        kakaoMap.enqueue(object : Callback<Monttak>{
-            override fun onResponse(call: Call<Monttak>, response: Response<Monttak>)
-            {
-                if(response.isSuccessful && response.code() == 200){
-                    data = response.body()!!
-                    binding.button.text=data.items[1].title
-                    longitude = data.items[1].longitude ?: 127.005515
-                    latitude = data.items[1].latitude ?: 37.537229
+        CoroutineScope(Dispatchers.Default).launch {
+            launch {
+                val intent = Intent(this@MainActivity, LoadingActivity::class.java)
+                startActivity(intent)
+            }
 
-                    Log.d("결과", "성공 : ${response.raw()}")
+            launch {
+                for(i in 43..46){
+                    val kakaoMap = api.getDataPage(i)
+                    kakaoMap.enqueue(object : Callback<Monttak>{
+                        override fun onResponse(call: Call<Monttak>, response: Response<Monttak>)
+                        {
+                            if(response.isSuccessful && response.code() == 200){
+                                if(data.isNullOrEmpty()){
+                                    data = response.body()!!.items as ArrayList<Item>
+                                }else{
+                                    data.addAll(response.body()!!.items)
+                                }
+
+                                binding.button.text=data[1].title
+                                longitude = data[1].longitude ?: 127.005515
+                                latitude = data[1].latitude ?: 37.537229
+
+//                        Log.d("결과", "성공 : ${response.raw()}")
+                            }
+
+                        }
+                        override fun onFailure(call: Call<Monttak>, t: Throwable) {
+//                    Log.d("결과:", "실패 : $t")
+                        }
+                    })
                 }
-
+                Log.d("최종 결과", "성공")
             }
-            override fun onFailure(call: Call<Monttak>, t: Throwable) {
-                Log.d("결과:", "실패 : $t")
-            }
-        })
+        }
         binding.button.setOnClickListener {
             if(latitude != 0.0 && longitude != 0.0){
                 val url ="kakaomap://look?p=${latitude},${longitude}"
@@ -128,10 +150,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){  // 네비게이션 메뉴가 클릭되면 스낵바가 나타난다.
-            R.id.account-> Snackbar.make(binding.toolbar,"Navigation Account pressed",Snackbar.LENGTH_SHORT).show()
-            R.id.setting->Snackbar.make(binding.toolbar,"Navigation Setting pressed",Snackbar.LENGTH_SHORT).show()
-        }
         binding.drawerLayout.closeDrawers() // 기능을 수행하고 네비게이션을 닫아준다.
         return false
     }
