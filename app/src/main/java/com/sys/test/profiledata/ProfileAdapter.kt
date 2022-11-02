@@ -12,7 +12,6 @@ import com.bumptech.glide.Glide
 import com.sys.test.R
 import com.sys.test.activity.ThirdActivity
 
-//datas 형식을 monttak.item이나 monttak으로 바꾸기
 class ProfileAdapter(private val datas : ArrayList<ProfileData>,private val context: Context) : RecyclerView.Adapter<ProfileAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

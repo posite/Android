@@ -39,46 +39,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         binding.navigationView.setNavigationItemSelectedListener(this)
 
-        var longitude : Double = 0.0
-        var latitude : Double  = 0.0
-        data = ArrayList<Item>()
-        val retrofit = Retrofit.Builder().baseUrl("https://api.visitjeju.net/vsjApi/contents/").addConverterFactory(GsonConverterFactory.create()).build()
-        val api = retrofit.create(KakaoMapApi::class.java)
-        CoroutineScope(Dispatchers.Default).launch {
-            launch {
-                val intent = Intent(this@MainActivity, LoadingActivity::class.java)
-                startActivity(intent)
-            }
+        var longitude : Double = 127.005515
+        var latitude : Double  = 37.537229
 
-            launch {
-                for(i in 43..46){
-                    val kakaoMap = api.getDataPage(i)
-                    kakaoMap.enqueue(object : Callback<Monttak>{
-                        override fun onResponse(call: Call<Monttak>, response: Response<Monttak>)
-                        {
-                            if(response.isSuccessful && response.code() == 200){
-                                if(data.isNullOrEmpty()){
-                                    data = response.body()!!.items as ArrayList<Item>
-                                }else{
-                                    data.addAll(response.body()!!.items)
-                                }
-
-                                binding.button.text=data[1].title
-                                longitude = data[1].longitude ?: 127.005515
-                                latitude = data[1].latitude ?: 37.537229
-
-//                        Log.d("결과", "성공 : ${response.raw()}")
-                            }
-
-                        }
-                        override fun onFailure(call: Call<Monttak>, t: Throwable) {
-//                    Log.d("결과:", "실패 : $t")
-                        }
-                    })
-                }
-                Log.d("최종 결과", "성공")
-            }
-        }
         binding.button.setOnClickListener {
             if(latitude != 0.0 && longitude != 0.0){
                 val url ="kakaomap://look?p=${latitude},${longitude}"
@@ -98,28 +61,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         binding.bol.setOnClickListener {
             var intent = Intent(applicationContext, SecondActivity::class.java)
-            intent.putExtra("datas",data)
             intent.putExtra("label","정보,축제/행사")
             intent.putExtra("split","bol")
             startActivity(intent)
         }
         binding.nol.setOnClickListener {
             var intent = Intent(applicationContext, SecondActivity::class.java)
-            intent.putExtra("datas",data)
             intent.putExtra("label","테마여행,쇼핑")
             intent.putExtra("split","bol")
             startActivity(intent)
         }
         binding.shil.setOnClickListener {
             var intent = Intent(applicationContext, SecondActivity::class.java)
-            intent.putExtra("datas",data)
             intent.putExtra("label","정보,숙박")
             intent.putExtra("split","shil")
             startActivity(intent)
         }
         binding.muk.setOnClickListener {
             var intent = Intent(applicationContext, SecondActivity::class.java)
-            intent.putExtra("datas",data)
             intent.putExtra("label","음식점")
             intent.putExtra("split","muk")
             startActivity(intent)
