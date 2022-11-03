@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         binding.shil.setOnClickListener {
             var intent = Intent(applicationContext, SecondActivity::class.java)
-            intent.putExtra("label","정보,숙박")
+            intent.putExtra("label","숙박")
             intent.putExtra("split","shil")
             startActivity(intent)
         }

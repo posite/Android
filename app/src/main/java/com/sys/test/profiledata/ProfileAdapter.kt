@@ -43,6 +43,7 @@ class ProfileAdapter(private val datas : ArrayList<ProfileData>,private val cont
 
         }
     }
-
-
+    fun deleteLoading(){
+        datas.removeAt(datas.lastIndex) // 로딩이 완료되면 프로그레스바를 지움
+    }
 }

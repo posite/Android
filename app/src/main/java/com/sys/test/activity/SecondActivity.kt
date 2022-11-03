@@ -9,6 +9,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
 import com.sys.test.R
 import com.sys.test.databinding.SecondBinding
@@ -31,77 +32,49 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-    private var isNavigationOpen = false
+    private var isNext = false // 다음 페이지 유무
+    private var resultDec = 45
+    private var split = ""
+    private var label = ""
     lateinit var profileAdapter: ProfileAdapter
     private var datas = ArrayList<ProfileData>()
     private lateinit var data: ArrayList<Item>
+    private var resultAmount = 0
+    private val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(1, TimeUnit.MINUTES)
+        .readTimeout(50, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
+        .build()
     private lateinit var secondBinding: SecondBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        var i = 1
-        val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(1, TimeUnit.MINUTES)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
-            .build()
+
         super.onCreate(savedInstanceState)
         secondBinding = SecondBinding.inflate(layoutInflater)
         setContentView(secondBinding.root)
         setToolbar()
-        var result = 0
         val intent = intent
         data = ArrayList<Item>()
-        val split = intent.getStringExtra("split")!!
-        val label = intent.getStringExtra("label")!!
+        split = intent.getStringExtra("split")!!
+        label = intent.getStringExtra("label")!!
         Log.d("split:", " : $split")
         Log.d("label:", " : $label")
-        if(data.isNullOrEmpty()){
-            val retrofit = Retrofit.Builder().baseUrl("https://api.visitjeju.net/vsjApi/contents/").client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create()).build()
-            val api = retrofit.create(KakaoMapApi::class.java)
-            CoroutineScope(Dispatchers.Default).launch {
-                launch {
-                    val intent = Intent(this@SecondActivity, LoadingActivity::class.java)
-                    startActivity(intent)
-                }
-            }
-            CoroutineScope(Dispatchers.IO).launch {
-                for (i in 42..45) {
-//                    var result: String = ""
-                    val kakaoMap = api.getDataPage(i)
-                    kakaoMap.enqueue(object : Callback<Monttak> {
-                        override fun onResponse(call: Call<Monttak>, response: Response<Monttak>) {
-                            if (response.isSuccessful && response.code() == 200) {
-//                                result = "success"
-                                if (data.isNullOrEmpty()) {
-                                    data = response.body()!!.items as ArrayList<Item>
-                                } else {
-                                    data.addAll(response.body()!!.items)
-                                }
-                                Log.d("결과", "성공 : ${response.raw()}")
-                                result++
-                                if(result==4){
-                                    initRecycler(data, label, split)
-                                    Log.d("최종 결과", "성공")
-                                }
-                            } else {
-
-                            }
-                        }
-
-                        override fun onFailure(call: Call<Monttak>, t: Throwable) {
-                            Log.d("결과:", "실패 : $t")
-                        }
-                    })
-
-//            if(result!="success"){
-//                i -= 1
-//            }
-                }
+        CoroutineScope(Dispatchers.Default).launch {
+            launch {
+                val intent = Intent(this@SecondActivity, LoadingActivity::class.java)
+                startActivity(intent)
             }
         }
-        else{
-            initRecycler(data, label, split)
-            Log.d("최종 결과", "성공")
+        CoroutineScope(Dispatchers.Main).launch {
+            launch {
+                val retrofit =
+                    Retrofit.Builder().baseUrl("https://api.visitjeju.net/vsjApi/contents/")
+                        .client(okHttpClient)
+                        .addConverterFactory(GsonConverterFactory.create()).build()
+                val api = retrofit.create(KakaoMapApi::class.java)
+                Log.d("apicall:", " : ")
+                apiCall(api, label, split)
+            }
         }
     }
 
@@ -135,7 +108,6 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                         )
                         count++
                     }
-
                 }
             }
         }
@@ -171,7 +143,40 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             }
         }
         Log.d("size", profileAdapter.itemCount.toString())
+    }
 
+    private fun apiCall(api: KakaoMapApi, label: String, split: String) {
+        var count = 0;
+
+        for (j in (resultDec - 4)..(resultDec)) {
+            val kakaoMap = api.getDataPage(j)
+            kakaoMap.enqueue(object : Callback<Monttak> {
+                override fun onResponse(call: Call<Monttak>, response: Response<Monttak>) {
+                    if (response.isSuccessful && response.code() == 200) {
+                        if (data.isNullOrEmpty()) {
+                            data = response.body()!!.items as ArrayList<Item>
+                        } else {
+                            data.addAll(response.body()!!.items)
+                        }
+                        Log.d("결과", "성공 : ${response.raw()}")
+                        resultAmount++
+                        if (resultAmount == 5) {
+                            initRecycler(data, label, split)
+                            initScrollListener(split)
+                            Log.d("최종 결과", "성공")
+                            resultAmount = 0
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<Monttak>, t: Throwable) {
+                    Log.d("결과:", "실패 : $t")
+                }
+            })
+            count++
+        }
+
+        resultDec -= count
     }
 
     private fun chooseView(category: String) {
@@ -251,5 +256,48 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun loadMorePosts() {
+        val retrofit = Retrofit.Builder().baseUrl("https://api.visitjeju.net/vsjApi/contents/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create()).build()
+        val api = retrofit.create(KakaoMapApi::class.java)
+        val handler = android.os.Handler()
+        Log.d("loadMore", "dd")
+        handler.postDelayed({ apiCall(api, label, split) }, 1000)
+    }
+
+    private fun initScrollListener(split: String) {
+
+        secondBinding.muklist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = secondBinding.muklist.layoutManager
+
+                // hasNextPage() -> 다음 페이지가 있는 경우
+                if (hasNextPage()) {
+                    val lastVisibleItem = (layoutManager as LinearLayoutManager)
+                        .findLastCompletelyVisibleItemPosition()
+                    val itemTotalCount = recyclerView.adapter!!.itemCount - 1
+                    // 마지막으로 보여진 아이템 position 이
+                    // 전체 아이템 개수보다 5개 모자란 경우, 데이터를 loadMore 한다
+                    if (!secondBinding.muklist.canScrollVertically(1) && lastVisibleItem == itemTotalCount) {
+                        loadMorePosts()
+                    }
+                }
+            }
+        })
+    }
+
+
+    private fun hasNextPage(): Boolean {
+        return isNext
+    }
+
+    private fun setHasNextPage(b: Boolean) {
+        isNext = b
     }
 }
