@@ -18,7 +18,6 @@ class ProfileAdapter(private val datas : ArrayList<ProfileData>,private val cont
         val view = LayoutInflater.from(parent.context).inflate(R.layout.monttakrecycler,parent,false)
         return ViewHolder(view)
     }
-
     override fun getItemCount(): Int = datas.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -40,7 +39,6 @@ class ProfileAdapter(private val datas : ArrayList<ProfileData>,private val cont
                     putExtra("data", data)
                 }.run{context.startActivity(this)}
             }
-
         }
     }
     fun deleteLoading(){

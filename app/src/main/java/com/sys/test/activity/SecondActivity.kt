@@ -32,10 +32,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-    private var isNext = false // 다음 페이지 유무
     private var resultDec = 45
     private var split = ""
     private var label = ""
+    private var count = 0
     lateinit var profileAdapter: ProfileAdapter
     private var datas = ArrayList<ProfileData>()
     private lateinit var data: ArrayList<Item>
@@ -79,7 +79,7 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun initRecycler(items: ArrayList<Item>, label: String, split: String) {
-        var count = 0
+        var itemCount = 0
         val token = label.split(",")
         for (i in 0 until items.size) {
             if (items[i].repPhoto != null && items[i].repPhoto.photoid != null) {
@@ -96,7 +96,7 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                                 item = items[i]
                             )
                         )
-                        count++
+                        itemCount++
                     } else {
                         datas.add(
                             ProfileData(
@@ -106,43 +106,46 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                                 item = items[i]
                             )
                         )
-                        count++
+                        itemCount++
                     }
                 }
             }
         }
-
+        count += itemCount
         Log.d("실제1 : ", count.toString())
         profileAdapter = ProfileAdapter(datas, this)
-        profileAdapter.notifyDataSetChanged()
-
         when (split) {
             "nol" -> {
+                profileAdapter.notifyItemRangeInserted(count, itemCount)
                 secondBinding.nollist.adapter = profileAdapter
                 secondBinding.nollist.layoutManager = LinearLayoutManager(this)
-
+                secondBinding.nollist.scrollToPosition(secondBinding.nollist.adapter!!.itemCount-1)
                 chooseView(split)
             }
             "bol" -> {
+                profileAdapter.notifyItemRangeInserted(count, itemCount)
                 secondBinding.bollist.adapter = profileAdapter
                 secondBinding.bollist.layoutManager = LinearLayoutManager(this)
-
                 chooseView(split)
+                secondBinding.nollist.scrollToPosition(secondBinding.bollist.adapter!!.itemCount-1)
             }
             "shil" -> {
+                profileAdapter.notifyItemRangeInserted(count, itemCount)
                 secondBinding.shillist.adapter = profileAdapter
                 secondBinding.shillist.layoutManager = LinearLayoutManager(this)
-
+                secondBinding.nollist.scrollToPosition(secondBinding.shillist.adapter!!.itemCount-1)
                 chooseView(split)
             }
             "muk" -> {
+                profileAdapter.notifyItemRangeInserted(count, itemCount)
                 secondBinding.muklist.adapter = profileAdapter
                 secondBinding.muklist.layoutManager = LinearLayoutManager(this)
-
+                secondBinding.nollist.scrollToPosition(secondBinding.muklist.adapter!!.itemCount-1)
                 chooseView(split)
             }
         }
         Log.d("size", profileAdapter.itemCount.toString())
+
     }
 
     private fun apiCall(api: KakaoMapApi, label: String, split: String) {
@@ -263,41 +266,102 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create()).build()
         val api = retrofit.create(KakaoMapApi::class.java)
-        val handler = android.os.Handler()
         Log.d("loadMore", "dd")
-        handler.postDelayed({ apiCall(api, label, split) }, 1000)
+        apiCall(api, label, split)
     }
 
     private fun initScrollListener(split: String) {
 
-        secondBinding.muklist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        when(split){
+            "muk"->{
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+                secondBinding.muklist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
-                val layoutManager = secondBinding.muklist.layoutManager
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
 
-                // hasNextPage() -> 다음 페이지가 있는 경우
-                if (hasNextPage()) {
-                    val lastVisibleItem = (layoutManager as LinearLayoutManager)
-                        .findLastCompletelyVisibleItemPosition()
-                    val itemTotalCount = recyclerView.adapter!!.itemCount - 1
-                    // 마지막으로 보여진 아이템 position 이
-                    // 전체 아이템 개수보다 5개 모자란 경우, 데이터를 loadMore 한다
-                    if (!secondBinding.muklist.canScrollVertically(1) && lastVisibleItem == itemTotalCount) {
-                        loadMorePosts()
+                        val layoutManager = secondBinding.muklist.layoutManager
+
+                        // hasNextPage() -> 다음 페이지가 있는 경우
+                        if (resultDec >1) {
+                            val lastVisibleItem = (layoutManager as LinearLayoutManager)
+                                .findLastCompletelyVisibleItemPosition()
+                            val itemTotalCount = recyclerView.adapter!!.itemCount - 1
+                            // 마지막으로 보여진 아이템 position 이
+                            // 전체 아이템 개수보다 5개 모자란 경우, 데이터를 loadMore 한다
+                            if (!secondBinding.muklist.canScrollVertically(1) && lastVisibleItem == itemTotalCount) {
+                                loadMorePosts()
+                            }
+                        }
                     }
-                }
+                })
             }
-        })
-    }
+            "nol"->{
+                secondBinding.bollist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
 
-    private fun hasNextPage(): Boolean {
-        return isNext
-    }
+                        val layoutManager = secondBinding.bollist.layoutManager
 
-    private fun setHasNextPage(b: Boolean) {
-        isNext = b
+                        // hasNextPage() -> 다음 페이지가 있는 경우
+                        if (resultDec >1) {
+                            val lastVisibleItem = (layoutManager as LinearLayoutManager)
+                                .findLastCompletelyVisibleItemPosition()
+                            val itemTotalCount = recyclerView.adapter!!.itemCount - 1
+                            // 마지막으로 보여진 아이템 position 이
+                            // 전체 아이템 개수보다 5개 모자란 경우, 데이터를 loadMore 한다
+                            if (!secondBinding.muklist.canScrollVertically(1) && lastVisibleItem == itemTotalCount) {
+                                loadMorePosts()
+                            }
+                        }
+                    }
+                })
+            }
+            "bol"->{
+                secondBinding.bollist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+
+                        val layoutManager = secondBinding.bollist.layoutManager
+
+                        // hasNextPage() -> 다음 페이지가 있는 경우
+                        if (resultDec >1) {
+                            val lastVisibleItem = (layoutManager as LinearLayoutManager)
+                                .findLastCompletelyVisibleItemPosition()
+                            val itemTotalCount = recyclerView.adapter!!.itemCount - 1
+                            // 마지막으로 보여진 아이템 position 이
+                            // 전체 아이템 개수보다 5개 모자란 경우, 데이터를 loadMore 한다
+                            if (!secondBinding.muklist.canScrollVertically(1) && lastVisibleItem == itemTotalCount) {
+                                loadMorePosts()
+                            }
+                        }
+                    }
+                })
+            }
+            "shil"->{
+                secondBinding.shillist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+
+                        val layoutManager = secondBinding.shillist.layoutManager
+
+                        // hasNextPage() -> 다음 페이지가 있는 경우
+                        if (resultDec >1) {
+                            val lastVisibleItem = (layoutManager as LinearLayoutManager)
+                                .findLastCompletelyVisibleItemPosition()
+                            val itemTotalCount = recyclerView.adapter!!.itemCount - 1
+                            // 마지막으로 보여진 아이템 position 이
+                            // 전체 아이템 개수보다 5개 모자란 경우, 데이터를 loadMore 한다
+                            if (!secondBinding.muklist.canScrollVertically(1) && lastVisibleItem == itemTotalCount) {
+                                loadMorePosts()
+                            }
+                        }
+                    }
+                })
+            }
+        }
     }
 }
