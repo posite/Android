@@ -170,7 +170,7 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
     private fun apiCall(api: KakaoMapApi, label: String, split: String) {
         var count = 0
-        if(resultDec!=0){
+        if(resultDec>=0){
             for (j in (resultDec - 4)..(resultDec)) {
                 val kakaoMap = api.getDataPage(j)
                 kakaoMap.enqueue(object : Callback<Monttak> {
@@ -201,6 +201,7 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         }
 
         resultDec -= count
+        Log.d("결과 resultDec", "성공 : ${resultDec}")
     }
 
     private fun chooseView(category: String) {
