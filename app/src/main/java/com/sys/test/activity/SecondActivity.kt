@@ -169,34 +169,35 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun apiCall(api: KakaoMapApi, label: String, split: String) {
-        var count = 0;
-
-        for (j in (resultDec - 4)..(resultDec)) {
-            val kakaoMap = api.getDataPage(j)
-            kakaoMap.enqueue(object : Callback<Monttak> {
-                override fun onResponse(call: Call<Monttak>, response: Response<Monttak>) {
-                    if (response.isSuccessful && response.code() == 200) {
-                        if (data.isNullOrEmpty()) {
-                            data = response.body()!!.items as ArrayList<Item>
-                        } else {
-                            data.addAll(response.body()!!.items)
-                        }
-                        Log.d("결과", "성공 : ${response.raw()}")
-                        resultAmount++
-                        if (resultAmount == 5) {
-                            initRecycler(data, label, split)
-                            initScrollListener(split)
-                            Log.d("최종 결과", "성공")
-                            resultAmount = 0
+        var count = 0
+        if(resultDec!=0){
+            for (j in (resultDec - 4)..(resultDec)) {
+                val kakaoMap = api.getDataPage(j)
+                kakaoMap.enqueue(object : Callback<Monttak> {
+                    override fun onResponse(call: Call<Monttak>, response: Response<Monttak>) {
+                        if (response.isSuccessful && response.code() == 200) {
+                            if (data.isNullOrEmpty()) {
+                                data = response.body()!!.items as ArrayList<Item>
+                            } else {
+                                data.addAll(response.body()!!.items)
+                            }
+                            Log.d("결과", "성공 : ${response.raw()}")
+                            resultAmount++
+                            if (resultAmount == 5) {
+                                initRecycler(data, label, split)
+                                initScrollListener(split)
+                                Log.d("최종 결과", "성공")
+                                resultAmount = 0
+                            }
                         }
                     }
-                }
 
-                override fun onFailure(call: Call<Monttak>, t: Throwable) {
-                    Log.d("결과:", "실패 : $t")
-                }
-            })
-            count++
+                    override fun onFailure(call: Call<Monttak>, t: Throwable) {
+                        Log.d("결과:", "실패 : $t")
+                    }
+                })
+                count++
+            }
         }
 
         resultDec -= count
