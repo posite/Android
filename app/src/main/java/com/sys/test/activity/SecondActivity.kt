@@ -88,24 +88,39 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                     )
                 ) {
                     if (!items[i].roadaddress.isNullOrEmpty()) {
-                        datas.add(
-                            ProfileData(
+                        if(!datas.contains(ProfileData(
                                 roadaddress = "주소 : " + items[i].roadaddress,
                                 thumbnailpath = items[i].repPhoto.photoid.thumbnailpath,
                                 title = "제목 : " + items[i].title,
                                 item = items[i]
-                            )
-                        )
+                            ))){
+                            datas.add(
+                                ProfileData(
+                                    roadaddress = "주소 : " + items[i].roadaddress,
+                                    thumbnailpath = items[i].repPhoto.photoid.thumbnailpath,
+                                    title = "제목 : " + items[i].title,
+                                    item = items[i]
+                                ))
+                        }
+
                         itemCount++
                     } else {
-                        datas.add(
-                            ProfileData(
+                        if(!datas.contains(ProfileData(
                                 roadaddress = "주소 : ",
                                 thumbnailpath = items[i].repPhoto.photoid.thumbnailpath,
                                 title = "제목 : " + items[i].title,
                                 item = items[i]
+                            ))){
+                            datas.add(
+                                ProfileData(
+                                    roadaddress = "주소 : ",
+                                    thumbnailpath = items[i].repPhoto.photoid.thumbnailpath,
+                                    title = "제목 : " + items[i].title,
+                                    item = items[i]
+                                )
                             )
-                        )
+                        }
+
                         itemCount++
                     }
                 }
@@ -113,35 +128,40 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         }
         count += itemCount
         Log.d("실제1 : ", count.toString())
-        profileAdapter = ProfileAdapter(datas, this)
+        if(resultDec==40){
+            Log.d("초기화","")
+            profileAdapter = ProfileAdapter(datas, this)
+            secondBinding.shillist.layoutManager = LinearLayoutManager(this)
+            secondBinding.muklist.layoutManager = LinearLayoutManager(this)
+            secondBinding.bollist.layoutManager = LinearLayoutManager(this)
+            secondBinding.nollist.layoutManager = LinearLayoutManager(this)
+            profileAdapter.notifyDataSetChanged()
+            chooseView(split)
+        }
         when (split) {
             "nol" -> {
-                profileAdapter.notifyItemRangeInserted(count, itemCount)
-                secondBinding.nollist.adapter = profileAdapter
-                secondBinding.nollist.layoutManager = LinearLayoutManager(this)
+                if(resultDec==40){
+                    secondBinding.nollist.adapter = profileAdapter
+                }
                 secondBinding.nollist.scrollToPosition(secondBinding.nollist.adapter!!.itemCount-1)
-                chooseView(split)
             }
             "bol" -> {
-                profileAdapter.notifyItemRangeInserted(count, itemCount)
-                secondBinding.bollist.adapter = profileAdapter
-                secondBinding.bollist.layoutManager = LinearLayoutManager(this)
-                chooseView(split)
+                if(resultDec==40){
+                    secondBinding.bollist.adapter = profileAdapter
+                }
                 secondBinding.nollist.scrollToPosition(secondBinding.bollist.adapter!!.itemCount-1)
             }
             "shil" -> {
-                profileAdapter.notifyItemRangeInserted(count, itemCount)
-                secondBinding.shillist.adapter = profileAdapter
-                secondBinding.shillist.layoutManager = LinearLayoutManager(this)
+                if(resultDec==40){
+                    secondBinding.shillist.adapter = profileAdapter
+                }
                 secondBinding.nollist.scrollToPosition(secondBinding.shillist.adapter!!.itemCount-1)
-                chooseView(split)
             }
             "muk" -> {
-                profileAdapter.notifyItemRangeInserted(count, itemCount)
-                secondBinding.muklist.adapter = profileAdapter
-                secondBinding.muklist.layoutManager = LinearLayoutManager(this)
+                if(resultDec==40){
+                    secondBinding.muklist.adapter = profileAdapter
+                }
                 secondBinding.nollist.scrollToPosition(secondBinding.muklist.adapter!!.itemCount-1)
-                chooseView(split)
             }
         }
         Log.d("size", profileAdapter.itemCount.toString())
@@ -262,12 +282,15 @@ class SecondActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun loadMorePosts() {
-        val retrofit = Retrofit.Builder().baseUrl("https://api.visitjeju.net/vsjApi/contents/")
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create()).build()
-        val api = retrofit.create(KakaoMapApi::class.java)
-        Log.d("loadMore", "dd")
-        apiCall(api, label, split)
+        CoroutineScope(Dispatchers.IO).launch{
+            val retrofit = Retrofit.Builder().baseUrl("https://api.visitjeju.net/vsjApi/contents/")
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create()).build()
+            val api = retrofit.create(KakaoMapApi::class.java)
+            Log.d("loadMore", "dd")
+            apiCall(api, label, split)
+        }
+
     }
 
     private fun initScrollListener(split: String) {
